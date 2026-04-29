@@ -37,6 +37,7 @@
     font-size: 16px;
     line-height: 1.55;
     overflow: hidden;
+    overscroll-behavior: none;
     -webkit-font-smoothing: antialiased;
   }
   ::selection { background: var(--accent); color: var(--ink); }
@@ -46,6 +47,7 @@
     position: relative;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
   }
   .slides {
@@ -59,6 +61,7 @@
     flex: 0 0 100vw;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     padding: 80px 96px 88px;
     display: flex;
     flex-direction: column;
@@ -67,6 +70,9 @@
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y pinch-zoom;
   }
   .slide::-webkit-scrollbar { display: none; }
   .slide-content {
@@ -1648,15 +1654,24 @@ one by one.
     }
   });
 
-  /* 4. Touch and swipe */
-  let touchX = null;
-  document.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+  /* 4. Touch and swipe — only fires on clearly-horizontal gestures so
+        vertical scrolling inside a slide is never hijacked. */
+  let touchStart = null;
+  document.addEventListener('touchstart', (e) => {
+    touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() };
+  }, { passive: true });
   document.addEventListener('touchend', (e) => {
-    if (touchX === null) return;
-    const dx = e.changedTouches[0].clientX - touchX;
-    if (Math.abs(dx) > 50) go(idx + (dx < 0 ? 1 : -1));
-    touchX = null;
-  });
+    if (!touchStart) return;
+    const dx = e.changedTouches[0].clientX - touchStart.x;
+    const dy = e.changedTouches[0].clientY - touchStart.y;
+    const dt = Date.now() - touchStart.t;
+    const absX = Math.abs(dx), absY = Math.abs(dy);
+    /* Horizontal-only: ignore if mostly vertical, too slow, or too short. */
+    if (absX > 60 && absX > absY * 1.6 && dt < 800) {
+      go(idx + (dx < 0 ? 1 : -1));
+    }
+    touchStart = null;
+  }, { passive: true });
 
   /* 5. Auto-advance timer */
   function startAuto() {
