@@ -369,6 +369,18 @@
     padding: 8px 14px;
     border-radius: 100px;
     text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: background 200ms var(--ease), border-color 200ms var(--ease), transform 200ms var(--ease);
+  }
+  a.skill:hover {
+    background: rgba(212,255,59,0.32);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(212,255,59,0.35);
   }
 
   /* Code block */
@@ -1214,7 +1226,7 @@
             <div class="n">F · 01</div>
             <div class="problem">AI didn't do what I wanted</div>
             <div class="fix">No shared design concept</div>
-            <div class="skill">/ grill-me</div>
+            <a class="skill" href="https://github.com/mattpocock/skills/blob/main/skills/engineering/grill-with-docs/SKILL.md" target="_blank" rel="noopener">/ grill-me ↗</a>
           </div>
           <div class="mode-row">
             <div class="n">F · 02</div>
